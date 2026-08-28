@@ -2,11 +2,13 @@ name: build playlists
 
 on:
   schedule:
-    - cron: "30 21 * * *"   # 毎日 06:30 JST（UTC 21:30）。jundoll氏の更新（04時台JST）より後
-  workflow_dispatch:        # 手動実行
+    - cron: "30 21 * * *"   # 毎日 06:30 JST
+    - cron: "0 3,9,15 * * *" # 12:00 / 18:00 / 24:00 JST（練習リストの更新用）
+  workflow_dispatch:
   push:
     paths:
       - sources.txt
+      - practice.txt
       - build.py
 
 permissions:
@@ -20,7 +22,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: install pillow
+        run: pip install --quiet pillow
       - name: build
+        env:
+          SCORESABER_ID: ${{ secrets.SCORESABER_ID }}
         run: python build.py
       - name: commit
         run: |
