@@ -1,6 +1,5 @@
 # 出力名<空白>取得元URL   （#で始まる行と空行は無視）
-# 出力名は playlists/<出力名>.bplist になり、同期URLもこの名前で決まる。
-# 同期URLを変えたくないので、出力名は一度決めたら変えないこと。
+# JBSLの大会リストはここに書かない。毎朝 leagues ページから自動発見される。
 
 # ---- ScoreSaber（jundoll氏、毎日更新）----
 ranked_star_00   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_00.bplist
@@ -20,7 +19,7 @@ ranked_star_13   https://github.com/jundoll/bs-ranked-playlist/releases/latest/d
 ranked_star_14   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_14.bplist
 ranked_star_qualified   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_qualified.bplist
 
-# ---- BeatLeader（jundoll氏、毎日更新）----
+# ---- BeatLeader（jundoll氏、毎日更新、4系統）----
 bl_ranked_star_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_00.bplist
 bl_ranked_star_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_01.bplist
 bl_ranked_star_02   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_02.bplist
@@ -40,6 +39,59 @@ bl_ranked_star_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/la
 bl_ranked_star_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_16.bplist
 bl_ranked_star_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_17.bplist
 
-# ---- JBSL（月ごとに1行追加。IDは大会ページのPLAYLISTリンク末尾の数字）----
-jbsl_2026-6_div4   https://jbsl-web.herokuapp.com/download_playlist/4650
-jbsl_2026-7_div4   https://jbsl-web.herokuapp.com/download_playlist/4749
+bl_ranked_acc_rate_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_00.bplist
+bl_ranked_acc_rate_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_01.bplist
+bl_ranked_acc_rate_02   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_02.bplist
+bl_ranked_acc_rate_03   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_03.bplist
+bl_ranked_acc_rate_04   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_04.bplist
+bl_ranked_acc_rate_05   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_05.bplist
+bl_ranked_acc_rate_06   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_06.bplist
+bl_ranked_acc_rate_07   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_07.bplist
+bl_ranked_acc_rate_08   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_08.bplist
+bl_ranked_acc_rate_09   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_09.bplist
+bl_ranked_acc_rate_10   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_10.bplist
+bl_ranked_acc_rate_11   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_11.bplist
+bl_ranked_acc_rate_12   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_12.bplist
+bl_ranked_acc_rate_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_13.bplist
+bl_ranked_acc_rate_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_14.bplist
+bl_ranked_acc_rate_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_15.bplist
+bl_ranked_acc_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_16.bplist
+bl_ranked_acc_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_17.bplist
+
+bl_ranked_pass_rate_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_00.bplist
+bl_ranked_pass_rate_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_01.bplist
+bl_ranked_pass_rate_02   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_02.bplist
+bl_ranked_pass_rate_03   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_03.bplist
+bl_ranked_pass_rate_04   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_04.bplist
+bl_ranked_pass_rate_05   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_05.bplist
+bl_ranked_pass_rate_06   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_06.bplist
+bl_ranked_pass_rate_07   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_07.bplist
+bl_ranked_pass_rate_08   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_08.bplist
+bl_ranked_pass_rate_09   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_09.bplist
+bl_ranked_pass_rate_10   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_10.bplist
+bl_ranked_pass_rate_11   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_11.bplist
+bl_ranked_pass_rate_12   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_12.bplist
+bl_ranked_pass_rate_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_13.bplist
+bl_ranked_pass_rate_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_14.bplist
+bl_ranked_pass_rate_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_15.bplist
+bl_ranked_pass_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_16.bplist
+bl_ranked_pass_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_17.bplist
+
+bl_ranked_tech_rate_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_00.bplist
+bl_ranked_tech_rate_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_01.bplist
+bl_ranked_tech_rate_02   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_02.bplist
+bl_ranked_tech_rate_03   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_03.bplist
+bl_ranked_tech_rate_04   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_04.bplist
+bl_ranked_tech_rate_05   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_05.bplist
+bl_ranked_tech_rate_06   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_06.bplist
+bl_ranked_tech_rate_07   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_07.bplist
+bl_ranked_tech_rate_08   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_08.bplist
+bl_ranked_tech_rate_09   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_09.bplist
+bl_ranked_tech_rate_10   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_10.bplist
+bl_ranked_tech_rate_11   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_11.bplist
+bl_ranked_tech_rate_12   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_12.bplist
+bl_ranked_tech_rate_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_13.bplist
+bl_ranked_tech_rate_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_14.bplist
+bl_ranked_tech_rate_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_15.bplist
+bl_ranked_tech_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_16.bplist
+bl_ranked_tech_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_17.bplist
