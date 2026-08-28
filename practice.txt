@@ -1,0 +1,15 @@
+# 練習リストの設定
+#
+# 列: 出力名  対象リスト(カンマ区切り)  基準精度  中央ラベル
+#
+# ScoreSaber の自分の記録と突き合わせて、基準精度に「届いていない」譜面だけを集める。
+#   - 未プレイの譜面は対象に含まれる（取りこぼし防止）
+#   - 同じ曲に複数難易度があるときは、基準以下の難易度だけを残す
+#   - 基準を超えた譜面は次回の生成時に自動で消える
+# 数値を変えたいときはこの行を書き換えるだけ。行を足せばリストが増える。
+
+practice_star_00-02   ranked_star_00,ranked_star_01,ranked_star_02   97   0-2
+practice_star_03      ranked_star_03                                 96   3
+practice_star_04      ranked_star_04                                 93   4
+practice_star_05      ranked_star_05                                 90   5
+practice_star_06      ranked_star_06                                 80   6
