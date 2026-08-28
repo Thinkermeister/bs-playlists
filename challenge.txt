@@ -1,0 +1,15 @@
+# チャレンジリストの設定
+#
+# 列: 出力名 / 対象(scoresaber|beatleader) / 範囲(global|country) /
+#     順位幅 / PP差の下限 / 自分のページ数 / ライバルのページ数
+#
+# 近い順位のライバルが自分より稼いでいる譜面を集める。1設定につき2本できる。
+#   <出力名>      … 自分もプレイ済みで負けている譜面（PP差の大きい順）
+#   <出力名>_new  … ライバルはやっているが自分は未プレイの譜面
+#
+# ページ数は1ページ=100譜面。増やすほど深く探すが実行時間も伸びる。
+
+challenge_ss_world   scoresaber   global    5   10   5   5
+challenge_ss_jp      scoresaber   country   5   10   5   5
+challenge_bl_world   beatleader   global    5   10   3   3
+challenge_bl_jp      beatleader   country   5   10   3   3

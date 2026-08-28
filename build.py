@@ -11,7 +11,9 @@ Beat Saber プレイリスト配布リポジトリのビルドスクリプト。
   5. 開催が終わった JBSL リストを archive/ へ移動
   6. practice.txt の設定に従い、ScoreSaber の自分の記録と突き合わせて
      「基準精度に届いていない譜面だけ」の練習リストを生成（未プレイも対象に含める）
-  7. Quest のブラウザから使う一覧ページ docs/index.html を生成
+  7. challenge.txt の設定に従い、近い順位のライバルが自分より稼いでいる譜面を集めた
+     チャレンジリスト（負けている譜面 / 未プレイ譜面）を生成
+  8. Quest のブラウザから使う一覧ページ docs/index.html を生成
 
 ローカル実行:  python build.py   （GITHUB_REPOSITORY 未設定時は DEFAULT_REPO を使う）
 """
@@ -43,6 +45,14 @@ JBSL_DL_URL = "https://jbsl-web.herokuapp.com/download_playlist/{}"
 PRACTICE_FILE = ROOT / "practice.txt"
 SS_SCORES_URL = "https://scoresaber.com/api/player/{pid}/scores?limit=100&sort=recent&page={page}"
 SS_DIFF_NAMES = {1: "Easy", 3: "Normal", 5: "Hard", 7: "Expert", 9: "ExpertPlus"}
+CHALLENGE_FILE = ROOT / "challenge.txt"
+SS_BASIC_URL = "https://scoresaber.com/api/player/{pid}/basic"
+SS_PLAYERS_URL = "https://scoresaber.com/api/players?page={page}"
+BL_PLAYER_URL = "https://api.beatleader.com/player/{pid}"
+BL_PLAYERS_URL = "https://api.beatleader.com/players?page={page}&count=50&sortBy=pp"
+BL_SCORES_URL = ("https://api.beatleader.com/player/{pid}/scores"
+                 "?page={page}&count=100&sortBy=pp&order=desc&type=ranked")
+PAGE_SIZE = 50
 TIMEOUT = 60
 UA = "bs-playlists-proxy/1.0 (+https://github.com/%s)"
 JST = timezone(timedelta(hours=9))
@@ -358,14 +368,229 @@ def build_practice(scores: dict[tuple[str, str, str], float]) -> int:
     return ok
 
 
+# ---------- チャレンジリスト ----------
+
+def read_challenge() -> list[tuple[str, str, str, int, float, int, int]]:
+    """challenge.txt を読む。
+    列: 出力名 / 対象(scoresaber|beatleader) / 範囲(global|country) / 順位幅 /
+        PP差の下限 / 自分のページ数 / ライバルのページ数"""
+    if not CHALLENGE_FILE.exists():
+        return []
+    items = []
+    for line in CHALLENGE_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        p = line.split()
+        if len(p) < 7:
+            print(f"  無視（書式不正）: {line}")
+            continue
+        items.append((p[0], p[1].lower(), p[2].lower(), int(p[3]), float(p[4]), int(p[5]), int(p[6])))
+    return items
+
+
+def _ss_rank_and_country(pid: str, scope: str) -> tuple[int, str]:
+    d = json.loads(fetch(SS_BASIC_URL.format(pid=pid)).decode("utf-8"))
+    country = str(d.get("country") or "")
+    return int(d["rank"] if scope == "global" else d["countryRank"]), country
+
+
+def _ss_players(page: int, scope: str, country: str) -> list[tuple[int, str]]:
+    url = SS_PLAYERS_URL.format(page=page)
+    if scope != "global":
+        url += f"&countries={country}"
+    d = json.loads(fetch(url).decode("utf-8"))
+    key = "rank" if scope == "global" else "countryRank"
+    return [(int(p[key]), str(p["id"])) for p in d.get("players", [])]
+
+
+def _ss_scores(pid: str, pages: int) -> dict[tuple[str, str, str], float]:
+    out: dict[tuple[str, str, str], float] = {}
+    for i in range(1, pages + 1):
+        d = json.loads(fetch(SS_SCORES_URL.format(pid=pid, page=i)).decode("utf-8"))
+        items = d.get("playerScores") or []
+        for it in items:
+            lb, sc = it.get("leaderboard") or {}, it.get("score") or {}
+            h = (lb.get("songHash") or "").strip().lower()
+            diff = lb.get("difficulty") or {}
+            dname = SS_DIFF_NAMES.get(diff.get("difficulty"))
+            mode = diff.get("gameMode") or "SoloStandard"
+            chara = mode[4:] if mode.startswith("Solo") else mode
+            pp = float(sc.get("pp") or 0)
+            if not (h and dname) or pp <= 0:
+                continue
+            k = (h, chara, dname)
+            if pp > out.get(k, -1.0):
+                out[k] = pp
+        if len(items) < 100:
+            break
+        time.sleep(0.2)
+    return out
+
+
+def _bl_rank_and_country(pid: str, scope: str) -> tuple[int, str]:
+    d = json.loads(fetch(BL_PLAYER_URL.format(pid=pid)).decode("utf-8"))
+    country = str(d.get("country") or "")
+    return int(d["rank"] if scope == "global" else d["countryRank"]), country
+
+
+def _bl_players(page: int, scope: str, country: str) -> list[tuple[int, str]]:
+    url = BL_PLAYERS_URL.format(page=page)
+    if scope != "global":
+        url += f"&countries={country}"
+    d = json.loads(fetch(url).decode("utf-8"))
+    key = "rank" if scope == "global" else "countryRank"
+    return [(int(p[key]), str(p["id"])) for p in d.get("data", [])]
+
+
+def _bl_scores(pid: str, pages: int) -> dict[tuple[str, str, str], float]:
+    out: dict[tuple[str, str, str], float] = {}
+    for i in range(1, pages + 1):
+        d = json.loads(fetch(BL_SCORES_URL.format(pid=pid, page=i)).decode("utf-8"))
+        items = d.get("data") or []
+        for it in items:
+            lb = it.get("leaderboard") or {}
+            song = lb.get("song") or {}
+            diff = lb.get("difficulty") or {}
+            h = (song.get("hash") or "").strip().lower()
+            dname = str(diff.get("difficultyName") or "")
+            chara = str(diff.get("modeName") or "Standard")
+            pp = float(it.get("pp") or 0)
+            if not (h and dname) or pp <= 0:
+                continue
+            k = (h, chara, dname)
+            if pp > out.get(k, -1.0):
+                out[k] = pp
+        if len(items) < 100:
+            break
+        time.sleep(0.2)
+    return out
+
+
+def make_challenge_cover(main: str, sub: str, base: tuple[int, int, int]) -> str | None:
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        import base64, io
+
+        def font(sz):
+            for p in ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",):
+                try:
+                    return ImageFont.truetype(p, sz)
+                except Exception:
+                    pass
+            return ImageFont.load_default()
+
+        W = H = 256
+        im = Image.new("RGB", (W, H), (0, 0, 0))
+        dr = ImageDraw.Draw(im)
+        m = int(W * 0.055)
+        dr.rectangle([m, m, W - m, H - m], fill=base)
+        b = int(W * 0.10)
+        dr.rectangle([b, 0, W - b, int(m * 1.9)], fill=(0, 0, 0))
+        dr.rectangle([b, H - int(m * 1.9), W - b, H], fill=(0, 0, 0))
+        f = font(int(W * 0.34))
+        bb = dr.textbbox((0, 0), main, font=f)
+        dr.text(((W - (bb[2] - bb[0])) / 2 - bb[0], H * 0.40 - (bb[3] - bb[1]) / 2 - bb[1]),
+                main, font=f, fill=(0, 0, 0))
+        bh = int(H * 0.24)
+        dr.rectangle([0, H - bh, W, H], fill=(20, 20, 20))
+        f2 = font(int(bh * 0.58))
+        bb = dr.textbbox((0, 0), sub, font=f2)
+        dr.text(((W - (bb[2] - bb[0])) / 2 - bb[0], H - bh + (bh - (bb[3] - bb[1])) / 2 - bb[1]),
+                sub, font=f2, fill=base)
+        buf = io.BytesIO()
+        im.save(buf, format="PNG", optimize=True)
+        return base64.b64encode(buf.getvalue()).decode("ascii")
+    except Exception as e:
+        print(f"  カバー生成スキップ ({main}/{sub}): {e}", file=sys.stderr)
+        return None
+
+
+def build_challenge() -> int:
+    """近い順位のライバルが自分より稼いでいる譜面を集める。
+    負けている譜面（pp差降順）と、未プレイ譜面（曲名順）を別リストにする。"""
+    cfgs = read_challenge()
+    if not cfgs:
+        return 0
+    ss_id = os.environ.get("SCORESABER_ID", "").strip()
+    bl_id = os.environ.get("BEATLEADER_ID", "").strip() or ss_id
+    ok = 0
+    for name, site, scope, span, ppmin, mypages, others in cfgs:
+        try:
+            if site == "scoresaber":
+                pid, rank_fn, players_fn, scores_fn = ss_id, _ss_rank_and_country, _ss_players, _ss_scores
+                main = "SS"
+            else:
+                pid, rank_fn, players_fn, scores_fn = bl_id, _bl_rank_and_country, _bl_players, _bl_scores
+                main = "BL"
+            if not pid:
+                print(f"  {name}: ID未設定のためスキップ", file=sys.stderr)
+                continue
+            myrank, country = rank_fn(pid, scope)
+            low, high = max(1, myrank - span), myrank + span
+            pages = sorted({1 + (r - 1) // PAGE_SIZE for r in (low, high)})
+            rivals = []
+            for pg in pages:
+                for r, rid in players_fn(pg, scope, country):
+                    if low <= r <= high and rid != pid:
+                        rivals.append((r, rid))
+                time.sleep(0.2)
+            print(f"{name}: 自分{myrank}位 / ライバル{len(rivals)}人 ({low}-{high}位)")
+            mine = scores_fn(pid, mypages)
+            beaten: dict[tuple[str, str, str], float] = {}
+            untouched: set[tuple[str, str, str]] = set()
+            for _, rid in rivals:
+                for k, pp in scores_fn(rid, others).items():
+                    if k in mine:
+                        d = pp - mine[k]
+                        if d >= ppmin and d > beaten.get(k, -1.0):
+                            beaten[k] = d
+                    else:
+                        untouched.add(k)
+                time.sleep(0.2)
+            untouched -= set(beaten)
+            sub = "WORLD" if scope == "global" else (country or "JP")
+            base = (255, 90, 40) if site == "scoresaber" else (255, 170, 20)
+            for suffix, keys, title in (
+                ("", sorted(beaten, key=lambda k: -beaten[k]), f"{main} Challenge ({sub})"),
+                ("_new", sorted(untouched), f"{main} Untouched ({sub})"),
+            ):
+                songs: dict[str, dict] = {}
+                order: list[str] = []
+                for h, chara, dname in keys:
+                    if h not in songs:
+                        songs[h] = {"hash": h, "levelid": f"custom_level_{h}", "difficulties": []}
+                        order.append(h)
+                    songs[h]["difficulties"].append({"characteristic": chara, "name": dname})
+                if not order:
+                    print(f"  {name}{suffix}: 該当なし")
+                    continue
+                data = {
+                    "playlistTitle": title if not suffix else title,
+                    "playlistAuthor": "bs-playlists",
+                    "songs": [songs[h] for h in order],
+                    "customData": {"syncURL": raw_url(name + suffix)},
+                }
+                cover = make_challenge_cover(main, sub if not suffix else sub + " NEW", base)
+                if cover:
+                    data["imageString"] = cover
+                if save(name + suffix, data, len(order), "challenge"):
+                    ok += 1
+        except Exception as e:
+            print(f"  {name}: 生成をスキップ（既存ファイルを維持）: {e}", file=sys.stderr)
+    return ok
+
+
 # ---------- 一覧ページ ----------
 
 def build_index() -> None:
     DOCS_DIR.mkdir(exist_ok=True)
-    groups: dict[str, list[Path]] = {"練習リスト": [], "JBSL（開催中）": [], "ScoreSaber": [],
-                                     "BeatLeader": [], "その他": []}
+    groups: dict[str, list[Path]] = {"練習リスト": [], "チャレンジ": [], "JBSL（開催中）": [],
+                                     "ScoreSaber": [], "BeatLeader": [], "その他": []}
     for f in sorted(OUT_DIR.glob("*.bplist")):
-        if f.stem.startswith("practice_"):
+        if f.stem.startswith("challenge_"):
+            groups["チャレンジ"].append(f)
+        elif f.stem.startswith("practice_"):
             groups["練習リスト"].append(f)
         elif f.stem.startswith("jbsl_"):
             groups["JBSL（開催中）"].append(f)
@@ -452,6 +677,7 @@ def main() -> int:
             ok += build_practice(scores)
         except Exception as e:
             print(f"練習リストの生成をスキップ（既存ファイルを維持）: {e}", file=sys.stderr)
+    ok += build_challenge()
     build_index()
     print(f"完了: 成功 {ok} / 失敗 {fail}")
     return 0 if ok else 1
