@@ -30,6 +30,12 @@ ARCHIVE_DIR = ROOT / "archive"
 DOCS_DIR = ROOT / "docs"
 SOURCES = ROOT / "sources.txt"
 JBSL_LEAGUES_URL = "https://jbsl-web.herokuapp.com/leagues/"
+# 固定枠: 出力名 -> 開催中リーグのタイトルにこの正規表現がマッチしたら、その中身を入れる。
+# ファイル名と同期URLが変わらないので、Quest側は一度入れれば以後は同期ボタンだけで
+# 最新の大会内容に入れ替わる（旅行先で新しい大会が始まっても追加作業が不要）。
+JBSL_SLOTS = {
+    "jbsl_current_div4": r"Div\.\s*4",
+}
 JBSL_DL_URL = "https://jbsl-web.herokuapp.com/download_playlist/{}"
 TIMEOUT = 60
 UA = "bs-playlists-proxy/1.0 (+https://github.com/%s)"
@@ -164,9 +170,34 @@ def discover_jbsl() -> tuple[list[tuple[str, dict, int]], bool]:
     return results, True
 
 
+def fill_slots(jbsl: list[tuple[str, dict, int]]) -> list[tuple[str, dict, int]]:
+    """開催中リーグの中から、固定枠のパターンに合うものを枠名でも書き出す。"""
+    out = []
+    for slot, pattern in JBSL_SLOTS.items():
+        hit = None
+        for _, data, before in jbsl:
+            title = str(data.get("playlistTitle") or "")
+            if re.search(pattern, title):
+                hit = (data, before, title)
+                break
+        if hit is None:
+            print(f"固定枠 {slot}: 該当する開催中リーグなし（既存ファイルを維持）")
+            continue
+        data, before, title = hit
+        copy = json.loads(json.dumps(data))       # 元データを壊さないよう複製
+        copy["playlistTitle"] = f"{title} [current]"
+        copy["customData"] = dict(copy.get("customData") or {})
+        copy["customData"]["syncURL"] = raw_url(slot)
+        out.append((slot, copy, before))
+        print(f"固定枠 {slot}: 「{title}」を割り当て")
+    return out
+
+
 def archive_ended(live_names: set[str]) -> None:
     ARCHIVE_DIR.mkdir(exist_ok=True)
     for f in sorted(OUT_DIR.glob("jbsl_*.bplist")):
+        if f.stem in JBSL_SLOTS:
+            continue                              # 固定枠は常に残す
         if f.stem not in live_names:
             dst = ARCHIVE_DIR / f.name
             if dst.exists():
@@ -244,6 +275,11 @@ def main() -> int:
     jbsl, discovered = discover_jbsl()
     for name, data, before in jbsl:
         if save(name, data, before, "jbsl"):
+            ok += 1
+        else:
+            fail += 1
+    for name, data, before in fill_slots(jbsl):
+        if save(name, data, before, "jbsl-slot"):
             ok += 1
         else:
             fail += 1
