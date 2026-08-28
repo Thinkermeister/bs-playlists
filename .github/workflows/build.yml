@@ -1,0 +1,35 @@
+name: build playlists
+
+on:
+  schedule:
+    - cron: "30 21 * * *"   # 毎日 06:30 JST（UTC 21:30）。jundoll氏の更新（04時台JST）より後
+  workflow_dispatch:        # 手動実行
+  push:
+    paths:
+      - sources.txt
+      - build.py
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: build
+        run: python build.py
+      - name: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add playlists
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "update playlists $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
