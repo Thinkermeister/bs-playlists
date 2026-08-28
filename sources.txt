@@ -1,0 +1,45 @@
+# 出力名<空白>取得元URL   （#で始まる行と空行は無視）
+# 出力名は playlists/<出力名>.bplist になり、同期URLもこの名前で決まる。
+# 同期URLを変えたくないので、出力名は一度決めたら変えないこと。
+
+# ---- ScoreSaber（jundoll氏、毎日更新）----
+ranked_star_00   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_00.bplist
+ranked_star_01   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_01.bplist
+ranked_star_02   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_02.bplist
+ranked_star_03   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_03.bplist
+ranked_star_04   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_04.bplist
+ranked_star_05   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_05.bplist
+ranked_star_06   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_06.bplist
+ranked_star_07   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_07.bplist
+ranked_star_08   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_08.bplist
+ranked_star_09   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_09.bplist
+ranked_star_10   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_10.bplist
+ranked_star_11   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_11.bplist
+ranked_star_12   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_12.bplist
+ranked_star_13   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_13.bplist
+ranked_star_14   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_14.bplist
+ranked_star_qualified   https://github.com/jundoll/bs-ranked-playlist/releases/latest/download/ranked_star_qualified.bplist
+
+# ---- BeatLeader（jundoll氏、毎日更新）----
+bl_ranked_star_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_00.bplist
+bl_ranked_star_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_01.bplist
+bl_ranked_star_02   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_02.bplist
+bl_ranked_star_03   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_03.bplist
+bl_ranked_star_04   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_04.bplist
+bl_ranked_star_05   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_05.bplist
+bl_ranked_star_06   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_06.bplist
+bl_ranked_star_07   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_07.bplist
+bl_ranked_star_08   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_08.bplist
+bl_ranked_star_09   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_09.bplist
+bl_ranked_star_10   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_10.bplist
+bl_ranked_star_11   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_11.bplist
+bl_ranked_star_12   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_12.bplist
+bl_ranked_star_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_13.bplist
+bl_ranked_star_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_14.bplist
+bl_ranked_star_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_15.bplist
+bl_ranked_star_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_16.bplist
+bl_ranked_star_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_17.bplist
+
+# ---- JBSL（月ごとに1行追加。IDは大会ページのPLAYLISTリンク末尾の数字）----
+jbsl_2026-6_div4   https://jbsl-web.herokuapp.com/download_playlist/4650
+jbsl_2026-7_div4   https://jbsl-web.herokuapp.com/download_playlist/4749
