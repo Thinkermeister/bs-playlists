@@ -39,5 +39,6 @@ jobs:
             echo "変更なし"
           else
             git commit -m "update playlists $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase
             git push
           fi
