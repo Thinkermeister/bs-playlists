@@ -9,6 +9,7 @@ on:
     paths:
       - sources.txt
       - practice.txt
+      - challenge.txt
       - build.py
 
 permissions:
@@ -27,6 +28,7 @@ jobs:
       - name: build
         env:
           SCORESABER_ID: ${{ secrets.SCORESABER_ID }}
+          BEATLEADER_ID: ${{ secrets.BEATLEADER_ID }}
         run: python build.py
       - name: commit
         run: |
