@@ -1,0 +1,13 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>oneclick test</title>
+<style>body{font-family:sans-serif;background:#14141f;color:#eee;margin:1em;line-height:1.8}
+a{color:#8cf;font-size:1.1em} small{color:#888;word-break:break-all}</style></head><body>
+<h1>OneClick 形式テスト</h1>
+<p>上から順に押して、どれが成功するか確認してください（対象はすべて ScoreSaber ☆13）。</p>
+<ul><li><a href="bsplaylist://playlist/https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist">A: そのまま（現行）</a><br><small>bsplaylist://playlist/https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/p…</small></li>
+<li><a href="bsplaylist://playlist/https%3A%2F%2Fraw.githubusercontent.com%2FThinkermeister%2Fbs-playlists%2Fmain%2Fplaylists%2Franked_star_13.bplist">B: URL全体をパーセントエンコード</a><br><small>bsplaylist://playlist/https%3A%2F%2Fraw.githubusercontent.com%2FThinkermeister%2Fbs-playli…</small></li>
+<li><a href="bsplaylist://playlist/https%3A//raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist">C: コロンだけエンコード</a><br><small>bsplaylist://playlist/https%3A//raw.githubusercontent.com/Thinkermeister/bs-playlists/main…</small></li>
+<li><a href="bsplaylist://playlist/raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist">D: スキームなし</a><br><small>bsplaylist://playlist/raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists…</small></li>
+<li><a href="bsplaylist://playlist//https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist">E: httpsを二重スラッシュ後に</a><br><small>bsplaylist://playlist//https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/…</small></li></ul>
+</body></html>
