@@ -1,0 +1,21 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>oneclick test 2</title>
+<style>body{font-family:sans-serif;background:#14141f;color:#eee;margin:1em;line-height:2}
+button{font-size:1.1em;padding:10px 14px;margin:6px 0;display:block;width:100%;
+background:#2a2a4a;color:#eee;border:1px solid #556;border-radius:6px}
+small{color:#888;word-break:break-all}</style></head><body>
+<h1>OneClick テスト2</h1>
+<p>JavaScript で直接遷移させる方式です。上から順に押してください。</p>
+
+<button onclick="location.href='bsplaylist://playlist/https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist'">F: location.href</button>
+<button onclick="location.assign('bsplaylist://playlist/https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist')">G: location.assign</button>
+<button onclick="window.open('bsplaylist://playlist/https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist','_self')">H: window.open</button>
+<button onclick="document.getElementById('f').src='bsplaylist://playlist/https://raw.githubusercontent.com/Thinkermeister/bs-playlists/main/playlists/ranked_star_13.bplist'">I: iframe 経由</button>
+<iframe id="f" style="display:none"></iframe>
+
+<hr>
+<p>参考: 曲のダウンロード（beatsaver 形式）が動くかの確認用</p>
+<button onclick="location.href='beatsaver://37f1'">J: beatsaver://37f1（曲1つ）</button>
+<p><small>Jが成功すれば、アプリのOneClick自体は生きていて、問題はプレイリストURLの渡し方だと確定します。</small></p>
+</body></html>
