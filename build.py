@@ -224,8 +224,10 @@ def archive_ended(live_names: set[str]) -> None:
 
 # ---------- 練習リスト ----------
 
-def read_practice() -> list[tuple[str, list[str], float, str]]:
-    """practice.txt を読む。列: 出力名 / 対象リスト(カンマ区切り) / 基準精度 / 中央ラベル"""
+def read_practice() -> list[tuple[str, list[str], float, str, str]]:
+    """practice.txt を読む。
+    列: 出力名 / 対象リスト(カンマ区切り) / 基準精度 / 中央ラベル / 判定元(scoresaber|beatleader)
+    判定元を省略した場合は scoresaber とみなす。"""
     if not PRACTICE_FILE.exists():
         return []
     items = []
@@ -237,8 +239,8 @@ def read_practice() -> list[tuple[str, list[str], float, str]]:
         if len(parts) < 4:
             print(f"  無視（書式不正）: {line}")
             continue
-        name, srcs, thr, label = parts[0], parts[1].split(","), float(parts[2]), parts[3]
-        items.append((name, srcs, thr, label))
+        site = parts[4].lower() if len(parts) >= 5 else "scoresaber"
+        items.append((parts[0], parts[1].split(","), float(parts[2]), parts[3], site))
     return items
 
 
@@ -273,7 +275,41 @@ def fetch_my_scores(pid: str) -> dict[tuple[str, str, str], float]:
     return acc
 
 
-def make_practice_cover(src_name: str, label: str, thr: float) -> str | None:
+def fetch_my_scores_bl(pid: str) -> dict[tuple[str, str, str], float]:
+    """BeatLeader から自分の全スコアを取得。(hash, characteristic, 難易度名) -> 精度%"""
+    acc: dict[tuple[str, str, str], float] = {}
+    page = 1
+    while page <= 100:
+        url = (f"https://api.beatleader.com/player/{pid}/scores"
+               f"?page={page}&count=100&sortBy=date&order=desc")
+        data = json.loads(fetch(url).decode("utf-8"))
+        items = data.get("data") or []
+        if not items:
+            break
+        for it in items:
+            lb = it.get("leaderboard") or {}
+            song = lb.get("song") or {}
+            diff = lb.get("difficulty") or {}
+            h = (song.get("hash") or "").strip().lower()
+            dname = str(diff.get("difficultyName") or "")
+            chara = str(diff.get("modeName") or "Standard")
+            a = it.get("accuracy")
+            if a is None or not (h and dname):
+                continue
+            a = float(a) * 100 if float(a) <= 1.5 else float(a)   # 0-1 表記にも対応
+            k = (h, chara, dname)
+            if a > acc.get(k, -1.0):
+                acc[k] = a
+        if len(items) < 100:
+            break
+        page += 1
+        time.sleep(0.3)
+    print(f"BeatLeader の自己記録: {len(acc)}譜面 ({page}ページ)")
+    return acc
+
+
+def make_practice_cover(src_name: str, label: str, thr: float,
+                        tint: tuple[int, int, int] = (26, 222, 255)) -> str | None:
     """元リストのカバーを流用し、色を変えて基準精度を書き込む。失敗したら None。"""
     try:
         from PIL import Image, ImageDraw, ImageFont
@@ -286,7 +322,10 @@ def make_practice_cover(src_name: str, label: str, thr: float) -> str | None:
         im = Image.open(io.BytesIO(base64.b64decode(raw))).convert("RGB")
         im = im.resize((256, 256), Image.NEAREST)
         r, g, b = im.split()
-        im = Image.merge("RGB", (b, g, r))                # 黄 → シアン（練習リストの目印）
+        if tint[2] >= tint[0]:
+            im = Image.merge("RGB", (b, g, r))            # 黄 → シアン（ScoreSaber 判定）
+        else:
+            im = Image.merge("RGB", (r, b, g))            # 黄 → マゼンタ寄り（BeatLeader 判定）
 
         def font(sz):
             for p in ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -300,7 +339,7 @@ def make_practice_cover(src_name: str, label: str, thr: float) -> str | None:
         dr = ImageDraw.Draw(im)
         W, H = im.size
         if "-" in label:                                   # 範囲指定なら元の数字を隠して書き直す
-            dr.rectangle([W * 0.14, H * 0.20, W * 0.86, H * 0.72], fill=(26, 222, 255))
+            dr.rectangle([W * 0.14, H * 0.20, W * 0.86, H * 0.72], fill=tint)
             f = font(int(W * 0.30))
             bb = dr.textbbox((0, 0), label, font=f)
             dr.text(((W - (bb[2] - bb[0])) / 2 - bb[0], H * 0.46 - (bb[3] - bb[1]) / 2 - bb[1]),
@@ -311,7 +350,7 @@ def make_practice_cover(src_name: str, label: str, thr: float) -> str | None:
         t2 = f"\u2264{thr:g}%"
         bb = dr.textbbox((0, 0), t2, font=f2)
         dr.text(((W - (bb[2] - bb[0])) / 2 - bb[0], H - bh + (bh - (bb[3] - bb[1])) / 2 - bb[1]),
-                t2, font=f2, fill=(0, 221, 255))
+                t2, font=f2, fill=tint)
         buf = io.BytesIO()
         im.save(buf, format="PNG", optimize=True)
         return base64.b64encode(buf.getvalue()).decode("ascii")
@@ -320,10 +359,14 @@ def make_practice_cover(src_name: str, label: str, thr: float) -> str | None:
         return None
 
 
-def build_practice(scores: dict[tuple[str, str, str], float]) -> int:
+def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]]) -> int:
     """基準精度に届いていない譜面だけを集めた練習リストを作る。未プレイは対象に含める。"""
     ok = 0
-    for name, srcs, thr, label in read_practice():
+    for name, srcs, thr, label, site in read_practice():
+        scores = scores_by_site.get(site) or {}
+        if not scores:
+            print(f"  {name}: {site} の記録が無いのでスキップ", file=sys.stderr)
+            continue
         merged: dict[str, dict] = {}
         order: list[str] = []
         total = 0
@@ -352,13 +395,15 @@ def build_practice(scores: dict[tuple[str, str, str], float]) -> int:
         if not order:
             print(f"  {name}: 残る譜面なし（全部達成済み）")
             continue
+        tag = "SS" if site == "scoresaber" else "BL"
         data = {
-            "playlistTitle": f"\u7df4\u7fd2 \u2605{label} {thr:g}%\u4ee5\u4e0b",
+            "playlistTitle": f"\u7df4\u7fd2 {tag} \u2605{label} {thr:g}%\u4ee5\u4e0b",
             "playlistAuthor": "bs-playlists",
             "songs": [merged[h] for h in order],
             "customData": {"syncURL": raw_url(name)},
         }
-        cover = make_practice_cover(srcs[0], label, thr)
+        tint = (26, 222, 255) if site == "scoresaber" else (255, 110, 220)
+        cover = make_practice_cover(srcs[0], label, thr, tint)
         if cover:
             data["imageString"] = cover
         kept = sum(len(s["difficulties"]) for s in data["songs"])
@@ -666,17 +711,25 @@ def main() -> int:
     if discovered:
         archive_ended({name for name, _, _ in jbsl})
     # 練習リスト（ScoreSaber の自己記録と突き合わせ）
-    pid = os.environ.get("SCORESABER_ID", "").strip()
-    if not pid:
-        print("SCORESABER_ID が未設定のため練習リストはスキップ（既存ファイルは維持）")
-    elif read_practice():
-        try:
-            scores = fetch_my_scores(pid)
-            if not scores:
-                raise ValueError("スコアを1件も取得できなかった")
-            ok += build_practice(scores)
-        except Exception as e:
-            print(f"練習リストの生成をスキップ（既存ファイルを維持）: {e}", file=sys.stderr)
+    cfgs = read_practice()
+    if cfgs:
+        need = {site for _, _, _, _, site in cfgs}
+        ss_id = os.environ.get("SCORESABER_ID", "").strip()
+        bl_id = os.environ.get("BEATLEADER_ID", "").strip() or ss_id
+        scores_by_site: dict[str, dict] = {}
+        for site, pid, fn in (("scoresaber", ss_id, fetch_my_scores),
+                              ("beatleader", bl_id, fetch_my_scores_bl)):
+            if site not in need:
+                continue
+            if not pid:
+                print(f"{site} のID未設定のため該当の練習リストはスキップ", file=sys.stderr)
+                continue
+            try:
+                scores_by_site[site] = fn(pid)
+            except Exception as e:
+                print(f"{site} の記録取得に失敗（該当リストは既存を維持）: {e}", file=sys.stderr)
+        if scores_by_site:
+            ok += build_practice(scores_by_site)
     ok += build_challenge()
     build_index()
     print(f"完了: 成功 {ok} / 失敗 {fail}")
