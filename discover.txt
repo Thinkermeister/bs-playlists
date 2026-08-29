@@ -1,0 +1,20 @@
+# BeatSaver 人気譜面リストの設定
+#
+# 列: 出力名 / 期間(日) / 更新タイミング / 件数 / 表示ラベル / 追加条件
+#
+# 更新タイミング: monday(毎週月曜) / first(毎月1日) / jan1(毎年1/1) / always(毎回)
+#   その日以外は既存ファイルをそのまま維持するので、途中でリストが入れ替わらない。
+#   ファイルがまだ無い場合は初回として必ず作る。
+#
+# 追加条件の書き方:
+#   -name  … その条件を false（除外）   例: -automapper（AI譜面を除外）
+#   +name  … その条件を true（必須）
+#   name=値 … そのまま指定             例: maxNps=12
+#
+# よく使う条件: automapper(AI) / ranked(ScoreSaberランク) / blRanked(BeatLeaderランク)
+#              noodle / chroma / me(MappingExtensions) / cinema / vivify
+#              minNps / maxNps / minDuration / maxDuration / fullSpread
+
+top_week    7     monday   50   WEEK    -automapper -ranked -blRanked -noodle -me -cinema -vivify
+top_month   30    first    50   MONTH   -automapper -ranked -blRanked -noodle -me -cinema -vivify
+top_year    365   jan1     50   YEAR    -automapper -ranked -blRanked -noodle -me -cinema -vivify

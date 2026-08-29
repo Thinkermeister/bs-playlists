@@ -13,7 +13,8 @@ Beat Saber プレイリスト配布リポジトリのビルドスクリプト。
      「基準精度に届いていない譜面だけ」の練習リストを生成（未プレイも対象に含める）
   7. challenge.txt の設定に従い、近い順位のライバルが自分より稼いでいる譜面を集めた
      チャレンジリスト（負けている譜面 / 未プレイ譜面）を生成
-  8. Quest のブラウザから使う一覧ページ docs/index.html を生成
+  8. discover.txt の設定に従い、BeatSaver の人気譜面リスト（週/月/年）を生成
+  9. Quest のブラウザから使う一覧ページ docs/index.html を生成
 
 ローカル実行:  python build.py   （GITHUB_REPOSITORY 未設定時は DEFAULT_REPO を使う）
 """
@@ -23,6 +24,7 @@ import os
 import re
 import sys
 import time
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -53,6 +55,8 @@ BL_PLAYERS_URL = "https://api.beatleader.com/players?page={page}&count=50&sortBy
 BL_SCORES_URL = ("https://api.beatleader.com/player/{pid}/scores"
                  "?page={page}&count=100&sortBy=pp&order=desc&type=ranked")
 PAGE_SIZE = 50
+DISCOVER_FILE = ROOT / "discover.txt"
+BS_SEARCH_URL = "https://api.beatsaver.com/search/text/{page}"
 TIMEOUT = 60
 UA = "bs-playlists-proxy/1.0 (+https://github.com/%s)"
 JST = timezone(timedelta(hours=9))
@@ -626,14 +630,123 @@ def build_challenge() -> int:
     return ok
 
 
+# ---------- BeatSaver 人気譜面 ----------
+
+def read_discover() -> list[tuple[str, int, str, int, str, dict]]:
+    """discover.txt を読む。
+    列: 出力名 / 期間(日) / 更新タイミング / 件数 / 表示ラベル / 追加条件(空白区切り)
+    追加条件は -name で除外(false)、+name で必須(true)、name=値 でそのまま指定。"""
+    if not DISCOVER_FILE.exists():
+        return []
+    items = []
+    for line in DISCOVER_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        p = line.split()
+        if len(p) < 5:
+            print(f"  無視（書式不正）: {line}")
+            continue
+        params: dict[str, str] = {}
+        for token in p[5:]:
+            if token.startswith("-"):
+                params[token[1:]] = "false"
+            elif token.startswith("+"):
+                params[token[1:]] = "true"
+            elif "=" in token:
+                k, v = token.split("=", 1)
+                params[k] = v
+        items.append((p[0], int(p[1]), p[2].lower(), int(p[3]), p[4], params))
+    return items
+
+
+def should_refresh(timing: str, exists: bool) -> bool:
+    """更新タイミングに当たる日か。ファイルが無ければ初回として必ず作る。"""
+    if not exists:
+        return True
+    now = datetime.now(JST)
+    if timing == "monday":
+        return now.weekday() == 0
+    if timing in ("first", "first_day"):
+        return now.day == 1
+    if timing in ("jan1", "yearly"):
+        return now.month == 1 and now.day == 1
+    if timing == "always":
+        return True
+    return False
+
+
+def make_discover_cover(label: str, sub: str) -> str | None:
+    return make_challenge_cover(label, sub, (120, 220, 90))
+
+
+def build_discover() -> int:
+    ok = 0
+    for name, days, timing, count, label, params in read_discover():
+        dst = OUT_DIR / f"{name}.bplist"
+        if not should_refresh(timing, dst.exists()):
+            print(f"  {name}: 更新日ではないので据え置き")
+            continue
+        try:
+            since = (datetime.now(JST) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            songs: list[dict] = []
+            seen: set[str] = set()
+            page = 0
+            while len(songs) < count and page < 10:
+                q = {"sortOrder": "Rating", "from": since, **params}
+                url = BS_SEARCH_URL.format(page=page) + "?" + urllib.parse.urlencode(q)
+                data = json.loads(fetch(url).decode("utf-8"))
+                docs = data.get("docs") or []
+                if not docs:
+                    break
+                for d in docs:
+                    vers = d.get("versions") or []
+                    if not vers:
+                        continue
+                    h = (vers[0].get("hash") or "").strip().lower()
+                    if not h or h in seen:
+                        continue
+                    seen.add(h)
+                    songs.append({
+                        "hash": h,
+                        "levelid": f"custom_level_{h}",
+                        "songName": str(d.get("name") or ""),
+                        "levelAuthorName": str((d.get("uploader") or {}).get("name") or ""),
+                    })
+                    if len(songs) >= count:
+                        break
+                page += 1
+                time.sleep(0.3)
+            if not songs:
+                raise ValueError("該当する譜面が無かった")
+            data = {
+                "playlistTitle": f"BeatSaver Top {label}",
+                "playlistAuthor": "bs-playlists",
+                "songs": songs,
+                "customData": {"syncURL": raw_url(name)},
+            }
+            cover = make_discover_cover("TOP", label.upper())
+            if cover:
+                data["imageString"] = cover
+            if save(name, data, len(songs), "discover"):
+                ok += 1
+        except Exception as e:
+            kept = "（既存ファイルを維持）" if dst.exists() else "（ファイルなし）"
+            print(f"  {name}: 生成をスキップ {kept} {e}", file=sys.stderr)
+    return ok
+
+
 # ---------- 一覧ページ ----------
 
 def build_index() -> None:
     DOCS_DIR.mkdir(exist_ok=True)
-    groups: dict[str, list[Path]] = {"練習リスト": [], "チャレンジ": [], "JBSL（開催中）": [],
-                                     "ScoreSaber": [], "BeatLeader": [], "その他": []}
+    groups: dict[str, list[Path]] = {"練習リスト": [], "チャレンジ": [], "BeatSaver人気": [],
+                                     "JBSL（開催中）": [], "ScoreSaber": [], "BeatLeader": [],
+                                     "その他": []}
     for f in sorted(OUT_DIR.glob("*.bplist")):
-        if f.stem.startswith("challenge_"):
+        if f.stem.startswith("top_"):
+            groups["BeatSaver人気"].append(f)
+        elif f.stem.startswith("challenge_"):
             groups["チャレンジ"].append(f)
         elif f.stem.startswith("practice_"):
             groups["練習リスト"].append(f)
@@ -731,6 +844,7 @@ def main() -> int:
         if scores_by_site:
             ok += build_practice(scores_by_site)
     ok += build_challenge()
+    ok += build_discover()
     build_index()
     print(f"完了: 成功 {ok} / 失敗 {fail}")
     return 0 if ok else 1
