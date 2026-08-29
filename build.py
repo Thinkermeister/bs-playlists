@@ -422,7 +422,8 @@ def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]])
 def read_challenge() -> list[tuple[str, str, str, int, float, int, int]]:
     """challenge.txt を読む。
     列: 出力名 / 対象(scoresaber|beatleader) / 範囲(global|country) / 順位幅 /
-        PP差の下限 / 自分のページ数 / ライバルのページ数"""
+        PP差の下限 / 自分のページ数 / ライバルのページ数
+    ライバルのスコアは日単位でしか動かないので、生成は1日1回（朝の実行）だけ行う。"""
     if not CHALLENGE_FILE.exists():
         return []
     items = []
@@ -560,6 +561,12 @@ def build_challenge() -> int:
     負けている譜面（pp差降順）と、未プレイ譜面（曲名順）を別リストにする。"""
     cfgs = read_challenge()
     if not cfgs:
+        return 0
+    # ライバルの記録は日単位でしか変わらないので、朝の回だけ作り直す。
+    # ファイルが1本も無い初回だけは、時刻に関係なく生成する。
+    first_time = not any((OUT_DIR / f"{c[0]}.bplist").exists() for c in cfgs)
+    if not first_time and datetime.now(JST).hour != 6:
+        print("チャレンジリストは1日1回（朝6時台）のみ更新するため据え置き")
         return 0
     ss_id = os.environ.get("SCORESABER_ID", "").strip()
     bl_id = os.environ.get("BEATLEADER_ID", "").strip() or ss_id
