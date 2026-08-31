@@ -60,18 +60,32 @@ def get_json(url, retries=3):
     return None
 
 
-def head_ok(url, retries=2):
-    """CDN に zip が実在するか。存在すれば (True, サイズ)。"""
+def zip_exists(url, retries=2):
+    """CDN に zip が実在するか。
+
+    HEAD は BeatSaver の CDN が受け付けず一律 404 を返すことがあるため、
+    Range 付きの GET で先頭1バイトだけ要求して判定する。
+    本文は読まずに接続を閉じるので、転送量はほぼゼロ。
+    """
     for i in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA}, method="HEAD")
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": UA, "Range": "bytes=0-0"},
+                method="GET",
+            )
             with urllib.request.urlopen(req, timeout=30) as r:
-                return True, r.headers.get("Content-Length", "")
+                code = r.status
+                size = r.headers.get("Content-Range") or r.headers.get("Content-Length", "")
+                return True, f"{code} {size}".strip()
         except urllib.error.HTTPError as e:
-            if e.code in (403, 404):
+            if e.code in (403, 404, 410):
                 return False, str(e.code)
+            if e.code == 429:
+                time.sleep(5 * (i + 1))
+                continue
             time.sleep(2 * (i + 1))
-        except Exception:
+        except Exception as e:
             time.sleep(2 * (i + 1))
     return False, "error"
 
@@ -121,6 +135,7 @@ def main():
     # --- 手順2/3: 実際に落とせるかを zip の有無で確認 ---
     rows = []
     problems = []
+    checked = 0
     for h in hashes:
         info = found.get(h)
         if info and info["matched"] and info["url"]:
@@ -129,7 +144,10 @@ def main():
         else:
             url = CDN.format(h)  # mod のフォールバックと同じ
             verdict_hint = "マップ無し" if not info else "版が見つからない"
-        ok, detail = head_ok(url)
+        ok, detail = zip_exists(url)
+        if checked < 3:
+            print(f"  [zip確認サンプル] {url} -> ok={ok} detail={detail}")
+            checked += 1
         verdict = "OK" if ok else "NG"
         if not ok:
             problems.append((h, name_of.get(h, ""), verdict_hint, detail))
