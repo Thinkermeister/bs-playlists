@@ -1,0 +1,32 @@
+name: check downloadable
+
+on:
+  workflow_dispatch:
+    inputs:
+      playlist:
+        description: "playlists/ 以下のファイル名"
+        required: true
+        default: "practice_bl_04.bplist"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: check
+        env:
+          PLAYLIST: ${{ github.event.inputs.playlist }}
+        run: python tools/check_playlist_downloadable.py "playlists/$PLAYLIST"
+
+      - name: upload result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: check-result
+          path: "*_check.csv"
+          if-no-files-found: warn
