@@ -21,7 +21,7 @@ jobs:
       - name: check
         env:
           PLAYLIST: ${{ github.event.inputs.playlist }}
-        run: python tools/check_playlist_downloadable.py "playlists/$PLAYLIST"
+          run: python .github/workflows/tools/check_playlist_downloadable.py "playlists/$PLAYLIST"
 
       - name: upload result
         if: always()
