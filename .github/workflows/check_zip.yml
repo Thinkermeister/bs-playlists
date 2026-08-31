@@ -21,7 +21,7 @@ jobs:
       - name: check
         env:
           PLAYLIST: ${{ github.event.inputs.playlist }}
-        run: python .github/workflows/tools/check_zip_layout.py "playlists/$PLAYLIST"
+        run: python .github/workflows/tools/check_zip_layout_v2.py "playlists/$PLAYLIST"
 
       - name: upload result
         if: always()
