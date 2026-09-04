@@ -17,8 +17,8 @@ practice_ss_05      ranked_star_05                                 90   5     sc
 practice_ss_06      ranked_star_06                                 80   6     scoresaber
 
 # ---- BeatLeader（ScoreSaberより☆が1つ高めに出るので、その分ずらしてある）----
-practice_bl_00-03   bl_ranked_star_00,bl_ranked_star_01,bl_ranked_star_02,bl_ranked_star_03   97   0-3   beatleader
-practice_bl_04      bl_ranked_star_04   96   4   beatleader
-practice_bl_05      bl_ranked_star_05   93   5   beatleader
-practice_bl_06      bl_ranked_star_06   90   6   beatleader
+practice_bl_00-03   bl_ranked_star_00,bl_ranked_star_01,bl_ranked_star_02,bl_ranked_star_03   96   0-3   beatleader
+practice_bl_04      bl_ranked_star_04   93   4   beatleader
+practice_bl_05      bl_ranked_star_05   90   5   beatleader
+practice_bl_06      bl_ranked_star_06   80   6   beatleader
 practice_bl_07      bl_ranked_star_07   60   7   beatleader
