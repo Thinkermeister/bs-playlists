@@ -36,10 +36,10 @@ bl_ranked_star_12   https://github.com/jundoll/bs-bl-ranked-playlist/releases/la
 bl_ranked_star_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_13.bplist
 bl_ranked_star_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_14.bplist
 bl_ranked_star_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_15.bplist
-bl_ranked_star_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_16.bplist
-bl_ranked_star_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_17.bplist
+# bl_ranked_star_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_16.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
+# bl_ranked_star_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_star_17.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
 
-bl_ranked_acc_rate_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_00.bplist
+# bl_ranked_acc_rate_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_00.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
 bl_ranked_acc_rate_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_01.bplist
 bl_ranked_acc_rate_02   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_02.bplist
 bl_ranked_acc_rate_03   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_03.bplist
@@ -55,8 +55,8 @@ bl_ranked_acc_rate_12   https://github.com/jundoll/bs-bl-ranked-playlist/release
 bl_ranked_acc_rate_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_13.bplist
 bl_ranked_acc_rate_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_14.bplist
 bl_ranked_acc_rate_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_15.bplist
-bl_ranked_acc_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_16.bplist
-bl_ranked_acc_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_17.bplist
+# bl_ranked_acc_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_16.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
+# bl_ranked_acc_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_acc_rate_17.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
 
 bl_ranked_pass_rate_00   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_00.bplist
 bl_ranked_pass_rate_01   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_pass_rate_01.bplist
@@ -92,6 +92,6 @@ bl_ranked_tech_rate_11   https://github.com/jundoll/bs-bl-ranked-playlist/releas
 bl_ranked_tech_rate_12   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_12.bplist
 bl_ranked_tech_rate_13   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_13.bplist
 bl_ranked_tech_rate_14   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_14.bplist
-bl_ranked_tech_rate_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_15.bplist
-bl_ranked_tech_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_16.bplist
-bl_ranked_tech_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_17.bplist
+# bl_ranked_tech_rate_15   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_15.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
+# bl_ranked_tech_rate_16   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_16.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
+# bl_ranked_tech_rate_17   https://github.com/jundoll/bs-bl-ranked-playlist/releases/latest/download/bl_ranked_tech_rate_17.bplist    # 配布元に該当ファイルが無く常に失敗するため無効化（復活したら戻す）
