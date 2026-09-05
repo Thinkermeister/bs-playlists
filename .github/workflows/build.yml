@@ -21,6 +21,13 @@ on:
 permissions:
   contents: write
 
+# 同時に2本走らせない。設定ファイルを続けて編集すると push トリガが重なり、
+# 後発が git pull --rebase で衝突して失敗する（2026-09-05 の #54 がこれ）。
+# 待たせれば、後発はチェックアウト時点で先発の結果を取り込める。
+concurrency:
+  group: build-playlists
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
