@@ -5,11 +5,17 @@ on:
     - cron: "30 21 * * *"   # 毎日 06:30 JST
     - cron: "0 3,9,15 * * *" # 12:00 / 18:00 / 24:00 JST（練習リストの更新用）
   workflow_dispatch:
+    inputs:
+      force_challenge:
+        description: 'チャレンジリストを間隔を無視して強制再生成する'
+        type: boolean
+        default: false
   push:
     paths:
       - sources.txt
       - practice.txt
       - challenge.txt
+      - discover.txt
       - build.py
 
 permissions:
@@ -29,6 +35,7 @@ jobs:
         env:
           SCORESABER_ID: ${{ secrets.SCORESABER_ID }}
           BEATLEADER_ID: ${{ secrets.BEATLEADER_ID }}
+          FORCE_CHALLENGE: ${{ github.event.inputs.force_challenge == 'true' && '1' || '0' }}
         run: python build.py
       - name: commit
         run: |
