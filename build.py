@@ -48,7 +48,15 @@ PRACTICE_FILE = ROOT / "practice.txt"
 SS_SCORES_URL = "https://scoresaber.com/api/player/{pid}/scores?limit=100&sort=recent&page={page}"
 SS_DIFF_NAMES = {1: "Easy", 3: "Normal", 5: "Hard", 7: "Expert", 9: "ExpertPlus"}
 CHALLENGE_FILE = ROOT / "challenge.txt"
+# チャレンジリストの最小生成間隔。1日4回の実行のうち必ず1回は拾えて、
+# かつ1日に2回は走らない長さにしてある。
+CHALLENGE_MIN_INTERVAL = timedelta(hours=20)
+# 設定に無い生成物を一度に削除してよい上限。これを超えたら設定ミスを疑って中止する。
+SWEEP_MAX = 20
 SS_BASIC_URL = "https://scoresaber.com/api/player/{pid}/basic"
+# チャレンジ用は pp の高い順で取る。sort=recent だと「直近nページ分のプレイ」しか
+# 見えず、既プレイ譜面の大半が未プレイ扱いになってしまう。
+SS_TOP_SCORES_URL = "https://scoresaber.com/api/player/{pid}/scores?limit=100&sort=top&page={page}"
 SS_PLAYERS_URL = "https://scoresaber.com/api/players?page={page}"
 BL_PLAYER_URL = "https://api.beatleader.com/player/{pid}"
 BL_PLAYERS_URL = "https://api.beatleader.com/players?page={page}&count=50&sortBy=pp"
@@ -224,6 +232,31 @@ def archive_ended(live_names: set[str]) -> None:
                 dst.unlink()
             f.rename(dst)
             print(f"アーカイブ: {f.name}（開催終了）")
+
+
+def sweep_orphans(expected: set[str]) -> int:
+    """設定ファイルのどこにも書かれていない生成物を削除する。
+
+    出力名を変えたり統合したりすると、古い名前のファイルが playlists/ に残り続け、
+    同期URLも生きたまま中身だけ凍結する。HMD 側では「同期しているのに更新されない
+    リスト」になって気づきにくいので、毎回掃除する。
+    消したファイルは git の履歴に残るので、必要なら復元できる。
+    jbsl_* は archive_ended() が別途面倒を見るのでここでは触らない。
+    """
+    if not expected:                                  # 設定が全部読めなかった場合の保険
+        print("掃除スキップ: 期待するリスト名が空", file=sys.stderr)
+        return 0
+    targets = [f for f in sorted(OUT_DIR.glob("*.bplist"))
+               if not f.stem.startswith("jbsl_") and f.stem not in expected]
+    if len(targets) > SWEEP_MAX:
+        # 設定ファイルの書き間違いなどで大量削除が起きるのを防ぐ
+        print(f"掃除中止: 削除対象が{len(targets)}件と多すぎます（上限{SWEEP_MAX}件）。"
+              f"設定ファイルを確認してください: {[f.stem for f in targets[:10]]}", file=sys.stderr)
+        return 0
+    for f in targets:
+        f.unlink()
+        print(f"削除: {f.name}（設定に無いため）")
+    return len(targets)
 
 
 # ---------- 練習リスト ----------
@@ -454,10 +487,11 @@ def _ss_players(page: int, scope: str, country: str) -> list[tuple[int, str]]:
     return [(int(p[key]), str(p["id"])) for p in d.get("players", [])]
 
 
-def _ss_scores(pid: str, pages: int) -> dict[tuple[str, str, str], float]:
+def _ss_scores(pid: str, pages: int,
+               names: dict[str, tuple[str, str]] | None = None) -> dict[tuple[str, str, str], float]:
     out: dict[tuple[str, str, str], float] = {}
     for i in range(1, pages + 1):
-        d = json.loads(fetch(SS_SCORES_URL.format(pid=pid, page=i)).decode("utf-8"))
+        d = json.loads(fetch(SS_TOP_SCORES_URL.format(pid=pid, page=i)).decode("utf-8"))
         items = d.get("playerScores") or []
         for it in items:
             lb, sc = it.get("leaderboard") or {}, it.get("score") or {}
@@ -469,6 +503,8 @@ def _ss_scores(pid: str, pages: int) -> dict[tuple[str, str, str], float]:
             pp = float(sc.get("pp") or 0)
             if not (h and dname) or pp <= 0:
                 continue
+            if names is not None and h not in names:
+                names[h] = (str(lb.get("songName") or ""), str(lb.get("levelAuthorName") or ""))
             k = (h, chara, dname)
             if pp > out.get(k, -1.0):
                 out[k] = pp
@@ -493,7 +529,8 @@ def _bl_players(page: int, scope: str, country: str) -> list[tuple[int, str]]:
     return [(int(p[key]), str(p["id"])) for p in d.get("data", [])]
 
 
-def _bl_scores(pid: str, pages: int) -> dict[tuple[str, str, str], float]:
+def _bl_scores(pid: str, pages: int,
+               names: dict[str, tuple[str, str]] | None = None) -> dict[tuple[str, str, str], float]:
     out: dict[tuple[str, str, str], float] = {}
     for i in range(1, pages + 1):
         d = json.loads(fetch(BL_SCORES_URL.format(pid=pid, page=i)).decode("utf-8"))
@@ -508,6 +545,8 @@ def _bl_scores(pid: str, pages: int) -> dict[tuple[str, str, str], float]:
             pp = float(it.get("pp") or 0)
             if not (h and dname) or pp <= 0:
                 continue
+            if names is not None and h not in names:
+                names[h] = (str(song.get("name") or ""), str(song.get("mapper") or ""))
             k = (h, chara, dname)
             if pp > out.get(k, -1.0):
                 out[k] = pp
@@ -556,17 +595,37 @@ def make_challenge_cover(main: str, sub: str, base: tuple[int, int, int]) -> str
         return None
 
 
+def _challenge_built_at(name: str) -> datetime | None:
+    """生成済みチャレンジリストに書いてある builtAt を読む。無ければ None。"""
+    f = OUT_DIR / f"{name}.bplist"
+    if not f.exists():
+        return None
+    try:
+        cd = json.loads(f.read_text(encoding="utf-8")).get("customData") or {}
+        v = cd.get("builtAt")
+        return datetime.fromisoformat(v) if v else None
+    except Exception:
+        return None
+
+
 def build_challenge() -> int:
     """近い順位のライバルが自分より稼いでいる譜面を集める。
     負けている譜面（pp差降順）と、未プレイ譜面（曲名順）を別リストにする。"""
     cfgs = read_challenge()
     if not cfgs:
         return 0
-    # ライバルの記録は日単位でしか変わらないので、朝の回だけ作り直す。
-    # ファイルが1本も無い初回だけは、時刻に関係なく生成する。
-    first_time = not any((OUT_DIR / f"{c[0]}.bplist").exists() for c in cfgs)
-    if not first_time and datetime.now(JST).hour != 6:
-        print("チャレンジリストは1日1回（朝6時台）のみ更新するため据え置き")
+    # ライバルの記録は日単位でしか変わらないので、1日1回だけ作り直す。
+    # 「JSTの何時か」で判定してはいけない: GitHub Actions のスケジュール実行は
+    # 混雑時に数時間ずれるため、狭い時間帯の条件は成立しないことがある。
+    # 代わりに、生成物自身に書いた builtAt からの経過時間で判定する。
+    now = datetime.now(JST)
+    stamps = [t for t in (_challenge_built_at(c[0]) for c in cfgs) if t]
+    newest = max(stamps) if stamps else None
+    if os.environ.get("FORCE_CHALLENGE") == "1":
+        print("チャレンジリスト: FORCE_CHALLENGE=1 のため強制生成")
+    elif newest is not None and (now - newest) < CHALLENGE_MIN_INTERVAL:
+        age = (now - newest).total_seconds() / 3600
+        print(f"チャレンジリストは前回生成から{age:.1f}時間なので据え置き")
         return 0
     ss_id = os.environ.get("SCORESABER_ID", "").strip()
     bl_id = os.environ.get("BEATLEADER_ID", "").strip() or ss_id
@@ -592,11 +651,12 @@ def build_challenge() -> int:
                         rivals.append((r, rid))
                 time.sleep(0.2)
             print(f"{name}: 自分{myrank}位 / ライバル{len(rivals)}人 ({low}-{high}位)")
-            mine = scores_fn(pid, mypages)
+            song_names: dict[str, tuple[str, str]] = {}
+            mine = scores_fn(pid, mypages, song_names)
             beaten: dict[tuple[str, str, str], float] = {}
             untouched: set[tuple[str, str, str]] = set()
             for _, rid in rivals:
-                for k, pp in scores_fn(rid, others).items():
+                for k, pp in scores_fn(rid, others, song_names).items():
                     if k in mine:
                         d = pp - mine[k]
                         if d >= ppmin and d > beaten.get(k, -1.0):
@@ -615,7 +675,10 @@ def build_challenge() -> int:
                 order: list[str] = []
                 for h, chara, dname in keys:
                     if h not in songs:
-                        songs[h] = {"hash": h, "levelid": f"custom_level_{h}", "difficulties": []}
+                        sn, la = song_names.get(h, ("", ""))
+                        songs[h] = {"songName": sn, "levelAuthorName": la,
+                                    "hash": h, "levelid": f"custom_level_{h}",
+                                    "difficulties": []}
                         order.append(h)
                     songs[h]["difficulties"].append({"characteristic": chara, "name": dname})
                 if not order:
@@ -625,7 +688,8 @@ def build_challenge() -> int:
                     "playlistTitle": title if not suffix else title,
                     "playlistAuthor": "bs-playlists",
                     "songs": [songs[h] for h in order],
-                    "customData": {"syncURL": raw_url(name + suffix)},
+                    "customData": {"syncURL": raw_url(name + suffix),
+                                   "builtAt": now.isoformat(timespec="seconds")},
                 }
                 cover = make_challenge_cover(main, sub if not suffix else sub + " NEW", base)
                 if cover:
@@ -852,6 +916,14 @@ def main() -> int:
             ok += build_practice(scores_by_site)
     ok += build_challenge()
     ok += build_discover()
+    # 設定に無くなった古い出力を退避してから一覧を作る（index に幽霊が残らないように）
+    expected = {n for n, _ in read_sources()}
+    expected |= {c[0] for c in read_practice()}
+    for c in read_challenge():
+        expected |= {c[0], c[0] + "_new"}
+    expected |= {d[0] for d in read_discover()}
+    expected |= set(JBSL_SLOTS)
+    sweep_orphans(expected)
     build_index()
     print(f"完了: 成功 {ok} / 失敗 {fail}")
     return 0 if ok else 1
