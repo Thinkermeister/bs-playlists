@@ -863,8 +863,38 @@ def build_index() -> None:
 
 # ---------- main ----------
 
+def run_practice() -> int:
+    """練習リスト（ScoreSaber / BeatLeader の自己記録と突き合わせ）だけを作り直す。"""
+    cfgs = read_practice()
+    if cfgs:
+        need = {site for _, _, _, _, site in cfgs}
+        ss_id = os.environ.get("SCORESABER_ID", "").strip()
+        bl_id = os.environ.get("BEATLEADER_ID", "").strip() or ss_id
+        scores_by_site: dict[str, dict] = {}
+        for site, pid, fn in (("scoresaber", ss_id, fetch_my_scores),
+                              ("beatleader", bl_id, fetch_my_scores_bl)):
+            if site not in need:
+                continue
+            if not pid:
+                print(f"{site} のID未設定のため該当の練習リストはスキップ", file=sys.stderr)
+                continue
+            try:
+                scores_by_site[site] = fn(pid)
+            except Exception as e:
+                print(f"{site} の記録取得に失敗（該当リストは既存を維持）: {e}", file=sys.stderr)
+        if scores_by_site:
+            return build_practice(scores_by_site)
+    return 0
+
+
 def main() -> int:
     OUT_DIR.mkdir(exist_ok=True)
+    # 毎時の実行は練習リストだけ。他のリストは元の頻度（1日4回）で十分なので触らない。
+    if os.environ.get("PRACTICE_ONLY") == "1":
+        print("PRACTICE_ONLY=1: 練習リストだけを更新")
+        ok = run_practice()
+        print(f"完了: 成功 {ok}")
+        return 0 if ok else 1
     ok = fail = 0
     # 定常ソース
     for name, url in read_sources():
@@ -894,26 +924,7 @@ def main() -> int:
             fail += 1
     if discovered:
         archive_ended({name for name, _, _ in jbsl})
-    # 練習リスト（ScoreSaber の自己記録と突き合わせ）
-    cfgs = read_practice()
-    if cfgs:
-        need = {site for _, _, _, _, site in cfgs}
-        ss_id = os.environ.get("SCORESABER_ID", "").strip()
-        bl_id = os.environ.get("BEATLEADER_ID", "").strip() or ss_id
-        scores_by_site: dict[str, dict] = {}
-        for site, pid, fn in (("scoresaber", ss_id, fetch_my_scores),
-                              ("beatleader", bl_id, fetch_my_scores_bl)):
-            if site not in need:
-                continue
-            if not pid:
-                print(f"{site} のID未設定のため該当の練習リストはスキップ", file=sys.stderr)
-                continue
-            try:
-                scores_by_site[site] = fn(pid)
-            except Exception as e:
-                print(f"{site} の記録取得に失敗（該当リストは既存を維持）: {e}", file=sys.stderr)
-        if scores_by_site:
-            ok += build_practice(scores_by_site)
+    ok += run_practice()
     ok += build_challenge()
     ok += build_discover()
     # 設定に無くなった古い出力を退避してから一覧を作る（index に幽霊が残らないように）
