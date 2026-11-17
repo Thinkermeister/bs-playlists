@@ -3,10 +3,11 @@ name: build playlists
 on:
   schedule:
     - cron: "30 21 * * *"   # 毎日 06:30 JST（全リスト）
-    - cron: "0 3,9,15 * * *" # 12:00 / 18:00 / 24:00 JST（全リスト）
-    # 毎時0分 JST（練習リストだけ）。上の全リスト更新と同じ時刻（3,9,15時UTC）は除く。
+    - cron: "17 3,9,15 * * *" # 12:17 / 18:17 / 24:17 JST（全リスト）
+    # 毎時17分 JST（練習リストだけ）。上の全リスト更新と同じ時刻（3,9,15時UTC）は除く。
+    # 毎時0分はGitHub側が混雑して遅延・取りこぼしが起きやすいので、分をずらしてある。
     # この行を変えるときは、下の PRACTICE_ONLY の判定文字列も同じに揃えること。
-    - cron: "0 0-2,4-8,10-14,16-23 * * *"
+    - cron: "17 0-2,4-8,10-14,16-23 * * *"
   workflow_dispatch:
     inputs:
       force_challenge:
@@ -46,7 +47,7 @@ jobs:
           SCORESABER_ID: ${{ secrets.SCORESABER_ID }}
           BEATLEADER_ID: ${{ secrets.BEATLEADER_ID }}
           FORCE_CHALLENGE: ${{ github.event.inputs.force_challenge == 'true' && '1' || '0' }}
-          PRACTICE_ONLY: ${{ github.event.schedule == '0 0-2,4-8,10-14,16-23 * * *' && '1' || '0' }}
+          PRACTICE_ONLY: ${{ github.event.schedule == '17 0-2,4-8,10-14,16-23 * * *' && '1' || '0' }}
         run: python build.py
       - name: commit
         run: |
