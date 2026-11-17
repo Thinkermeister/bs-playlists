@@ -1,0 +1,46 @@
+name: build practice lists
+
+# 練習リスト（ScoreSaber / BeatLeader の自己記録との突き合わせ）だけを作り直す。
+# GitHub の schedule は遅延・取りこぼしが多いので、こちらは外部（IFTTT）から
+# workflow_dispatch API で毎時起動する。schedule は持たせない（build.yml の定期実行はそのまま残す）。
+#   POST https://api.github.com/repos/Thinkermeister/bs-playlists/actions/workflows/practice.yml/dispatches
+#   body: {"ref":"main"}  → 成功時 HTTP 204
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# build.yml と同じグループにして、全リスト更新と同時に走らないようにする
+concurrency:
+  group: build-playlists
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install pillow
+        run: pip install --quiet pillow
+      - name: build practice lists
+        env:
+          SCORESABER_ID: ${{ secrets.SCORESABER_ID }}
+          BEATLEADER_ID: ${{ secrets.BEATLEADER_ID }}
+          PRACTICE_ONLY: "1"
+        run: python build.py
+      - name: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "update practice lists $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase
+            git push
+          fi
