@@ -1,0 +1,22 @@
+name: schedule canary
+
+# GitHubの定期実行がどれだけ時刻どおりに動くかを測るための観察用。
+# 何も取得・変更せず、予定時刻と実際の開始時刻をログに残すだけ。
+# 観察が終わったら、このファイルごと削除してよい。
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: record
+        run: |
+          echo "schedule=${{ github.event.schedule }}"
+          echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
