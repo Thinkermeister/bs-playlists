@@ -1,7 +1,7 @@
 name: build playlists
 
 on:
-    schedule:
+  schedule:
     # 6時間おき（全リスト）：06:31 / 12:31 / 18:31 / 24:31 JST
     # 2026-11時点、GitHubの定期実行は1日3回ほどしか動かないため、毎時はやめた。
     - cron: "31 3,9,15,21 * * *"
