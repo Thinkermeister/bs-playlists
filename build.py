@@ -411,6 +411,12 @@ def source_path(name: str) -> Path:
     return f
 
 
+def _now_jst() -> str:
+    """JST の現在時刻を 'YYYY-MM-DDTHH:MM' で返す（_until との文字列比較用）。"""
+    import datetime as _dt
+    return (_dt.datetime.utcnow() + _dt.timedelta(hours=9)).strftime("%Y-%m-%dT%H:%M")
+
+
 def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]]) -> int:
     """基準精度に届いていない譜面だけを集めた練習リストを作る。未プレイは対象に含める。"""
     ok = 0
@@ -435,8 +441,12 @@ def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]])
                     t = d.get("_thr", thr)                # 譜面ごとの基準があればそちらを優先
                     if t is None:
                         continue
-                    if scores.get((h, d.get("characteristic"), d.get("name")), -1.0) <= float(t):
-                        keep.append({k: v for k, v in d.items() if k != "_thr"})
+                    until = d.get("_until")               # 期限つき（例：JBSLの大会終了日時 JST）
+                    if until and _now_jst() > until:
+                        continue
+                    sc = scores_by_site.get(d.get("_site", site)) or {}   # 判定元を譜面ごとに変えられる
+                    if sc.get((h, d.get("characteristic"), d.get("name")), -1.0) <= float(t):
+                        keep.append({k: v for k, v in d.items() if not k.startswith("_")})
                 if not keep:
                     continue                              # 全難易度が基準を超えていれば曲ごと除外
                 if h in merged:

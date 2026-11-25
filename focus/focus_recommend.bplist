@@ -1,8 +1,218 @@
 {
  "playlistTitle": "Claude推薦（元リスト）",
  "playlistAuthor": "Claude（bs-analysis 2026-11-25）",
- "playlistDescription": "ScoreSaberの★0〜5から、弱点（中央越え・速い切り返し・下段の切り上げ・両手同時の外向き横切り）やあと一歩の譜面をClaudeが選んだ候補。基準は★ごと（★0-2=97%、★3=96%、★4=93%、★5=90%）。基準を超えた譜面は練習リストから自動で外れる。",
+ "playlistDescription": "ScoreSaberの★0〜5から、弱点（中央越え・速い切り返し・下段の切り上げ・両手同時の外向き横切り）やあと一歩の譜面をClaudeが選んだ候補。基準は★ごと（★0-2=97%、★3=96%、★4=93%、★5=90%）。基準を超えた譜面は練習リストから自動で外れる。 先頭はJBSL（JP Monthly 2026-10 Div.4）で一つ上の人まで1%以内の譜面。基準は一つ上の人の精度（BeatLeaderの記録で判定）、大会終了（11/30 23:59）で自動的に外れる。",
  "songs": [
+  {
+   "songName": "DECO*27 - Monitoring Best Friend Remix (Otonose Raco Cover)",
+   "levelAuthorName": "rindoblue",
+   "hash": "357edd9540dac5796325a606fa4c1054a235c34c",
+   "levelid": "custom_level_357edd9540dac5796325a606fa4c1054a235c34c",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 97.14,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "Yumcha - Aisaretai",
+   "levelAuthorName": "kiki535",
+   "hash": "c7362a077ace0920f999ddb722ec87639b077351",
+   "levelid": "custom_level_c7362a077ace0920f999ddb722ec87639b077351",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 95.2,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "Aiobahn - letter feat. 9Lana",
+   "levelAuthorName": "katsu0dashi",
+   "hash": "52c0eca09f334b34cd73632ccb4e3ececd48414b",
+   "levelid": "custom_level_52c0eca09f334b34cd73632ccb4e3ececd48414b",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 95.86,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "Tokyo Manaka - FOMO (feat. Kasane Teto)",
+   "levelAuthorName": "RUI",
+   "hash": "649cba2ca7e550479796d20341854897d7d2583c",
+   "levelid": "custom_level_649cba2ca7e550479796d20341854897d7d2583c",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Expert",
+     "_thr": 95.14,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "TAKIO - 多次元宇宙融合論 (feat. つぐ)",
+   "levelAuthorName": "iZU & Komeijisan",
+   "hash": "37f6e0619fa57176feadb58b05f7f7df609e2361",
+   "levelid": "custom_level_37f6e0619fa57176feadb58b05f7f7df609e2361",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 94.53,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "うさぎ (cv.小澤亜李) - うさぎラップ （リズム感がありすぎるうさぎの高速ラップRemix）",
+   "levelAuthorName": "takamitsu",
+   "hash": "d6f1d49910e5511afb2024accafc8a057b4a787d",
+   "levelid": "custom_level_d6f1d49910e5511afb2024accafc8a057b4a787d",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 96.39,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "MTD - FIRE",
+   "levelAuthorName": "Komeijisan051",
+   "hash": "281b486985547d45731efe1c35681a2c93c50281",
+   "levelid": "custom_level_281b486985547d45731efe1c35681a2c93c50281",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 90.44,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "kemu - Eien no Gin (Regret (CV:Arisa Kori))",
+   "levelAuthorName": "ApprShal",
+   "hash": "f397a972caa2050bd076e3960f6ec0badcafe3b5",
+   "levelid": "custom_level_f397a972caa2050bd076e3960f6ec0badcafe3b5",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 93.83,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "Tanger - The Great Hallow's Eve Heist: Stewart Skeleton's DASTARDLY \"Get Rich Quick!\" Scheme",
+   "levelAuthorName": "Komeijisan051",
+   "hash": "7ae25dd25e7af8140a69bc29f2bb9a54a3889b46",
+   "levelid": "custom_level_7ae25dd25e7af8140a69bc29f2bb9a54a3889b46",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 91.32,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "KIRA - FOCUS (Yano Kuromu cover)",
+   "levelAuthorName": "GqbLliy",
+   "hash": "a6cc1a4a3aa1fb922d1e55751a1bbbe50ae96679",
+   "levelid": "custom_level_a6cc1a4a3aa1fb922d1e55751a1bbbe50ae96679",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Expert",
+     "_thr": 91.22,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "ユリイ・カノン - Melodic Halloween Night (feat. Hatsune Miku)",
+   "levelAuthorName": "ApprShal",
+   "hash": "820c1dd3afb9408a2da943307657ca0e163f9cc4",
+   "levelid": "custom_level_820c1dd3afb9408a2da943307657ca0e163f9cc4",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 92.51,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "reulili - Kamino Manimani (At God's Mercy) feat.Miku&Rin&GUMI",
+   "levelAuthorName": "mikuri",
+   "hash": "e732129e791fd9827fd053da78aa1ccfc8f516e9",
+   "levelid": "custom_level_e732129e791fd9827fd053da78aa1ccfc8f516e9",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Expert",
+     "_thr": 92.13,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "Kaneko Chiharu vs t+pazolite - UROSOUSETSU",
+   "levelAuthorName": "take_nyan",
+   "hash": "c9940f35f81eaf031d84da3b7ec2b04dd881f3ed",
+   "levelid": "custom_level_c9940f35f81eaf031d84da3b7ec2b04dd881f3ed",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 94.34,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
+  {
+   "songName": "DECO*27 - BRAINWASHED (feat. Hatsune Miku)",
+   "levelAuthorName": "HicqLlie",
+   "hash": "6d70a70f86c5d1925aa2ee13cfb41db37df3d8db",
+   "levelid": "custom_level_6d70a70f86c5d1925aa2ee13cfb41db37df3d8db",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Expert",
+     "_thr": 90.44,
+     "_site": "beatleader",
+     "_until": "2026-11-30T23:59"
+    }
+   ]
+  },
   {
    "songName": "Naughty little demon",
    "levelAuthorName": "Hoppaw",
