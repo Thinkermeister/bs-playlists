@@ -1,7 +1,7 @@
 {
  "playlistTitle": "Claude推薦（元リスト）",
  "playlistAuthor": "Claude（bs-analysis 2026-11-25）",
- "playlistDescription": "ScoreSaberの★0〜5から、弱点（中央越え・速い切り返し・下段の切り上げ）やあと一歩の譜面をClaudeが選んだ候補。基準は★ごと（★0-2=97%、★3=96%、★4=93%、★5=90%）。基準を超えた譜面は練習リストから自動で外れる。",
+ "playlistDescription": "ScoreSaberの★0〜5から、弱点（中央越え・速い切り返し・下段の切り上げ・両手同時の外向き横切り）やあと一歩の譜面をClaudeが選んだ候補。基準は★ごと（★0-2=97%、★3=96%、★4=93%、★5=90%）。基準を超えた譜面は練習リストから自動で外れる。",
  "songs": [
   {
    "songName": "Naughty little demon",
@@ -421,6 +421,97 @@
      "characteristic": "Standard",
      "name": "Expert",
      "_thr": 90
+    }
+   ]
+  },
+  {
+   "songName": "Saufen morgens, mittags, abends",
+   "levelAuthorName": "Various Mappers",
+   "hash": "36d0db44e6528bd956d4a473d886433510d1be26",
+   "levelid": "custom_level_36d0db44e6528bd956d4a473d886433510d1be26",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 96
+    }
+   ]
+  },
+  {
+   "songName": "Goodbye",
+   "levelAuthorName": "Halcyon12",
+   "hash": "ac808132e23eb636385df76cc9abaf30a5ad28e8",
+   "levelid": "custom_level_ac808132e23eb636385df76cc9abaf30a5ad28e8",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Easy",
+     "_thr": 96
+    }
+   ]
+  },
+  {
+   "songName": "MAYDAY",
+   "levelAuthorName": "Oddloop, RedMagi & AaltopahWi",
+   "hash": "58e760690ffb379864d76b06505f4056e84fbe84",
+   "levelid": "custom_level_58e760690ffb379864d76b06505f4056e84fbe84",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 96
+    }
+   ]
+  },
+  {
+   "songName": "Meltdown feat. Rin",
+   "levelAuthorName": "Todokete",
+   "hash": "26933342740e324ffeeeb1ff53f5231e5cea3d95",
+   "levelid": "custom_level_26933342740e324ffeeeb1ff53f5231e5cea3d95",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Hard",
+     "_thr": 96
+    }
+   ]
+  },
+  {
+   "songName": "Midnight City",
+   "levelAuthorName": "BennyDaBeast",
+   "hash": "fbd8b9338bffb98555a10c69887234fac959d83d",
+   "levelid": "custom_level_fbd8b9338bffb98555a10c69887234fac959d83d",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 96
+    }
+   ]
+  },
+  {
+   "songName": "MariannE (Lanota Edit)",
+   "levelAuthorName": "Redmagi",
+   "hash": "afb47d1abb417a76a4293d29a725d6dd74d76782",
+   "levelid": "custom_level_afb47d1abb417a76a4293d29a725d6dd74d76782",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 96
+    }
+   ]
+  },
+  {
+   "songName": "Face to face",
+   "levelAuthorName": "CXZman",
+   "hash": "8ba8bc2465c017c7643ecc645263f03bccfafa64",
+   "levelid": "custom_level_8ba8bc2465c017c7643ecc645263f03bccfafa64",
+   "difficulties": [
+    {
+     "characteristic": "Standard",
+     "name": "Normal",
+     "_thr": 96
     }
    ]
   }
