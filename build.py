@@ -33,6 +33,9 @@ DEFAULT_REPO = "Thinkermeister/bs-playlists"
 BRANCH = "main"
 ROOT = Path(__file__).resolve().parent
 OUT_DIR = ROOT / "playlists"
+# 分析で選んだ「重点練習」の候補リスト置き場。playlists/ は自動掃除の対象なので分けてある。
+# practice.txt の対象リスト名に、ここにあるファイル名（拡張子なし）を書ける。
+FOCUS_DIR = ROOT / "focus"
 ARCHIVE_DIR = ROOT / "archive"
 DOCS_DIR = ROOT / "docs"
 SOURCES = ROOT / "sources.txt"
@@ -351,7 +354,7 @@ def make_practice_cover(src_name: str, label: str, thr: float,
     try:
         from PIL import Image, ImageDraw, ImageFont
         import base64, io
-        src = OUT_DIR / f"{src_name}.bplist"
+        src = source_path(src_name)
         d = json.loads(src.read_text(encoding="utf-8"))
         raw = d.get("imageString") or d.get("image") or ""
         if raw.startswith("data:"):
@@ -396,6 +399,14 @@ def make_practice_cover(src_name: str, label: str, thr: float,
         return None
 
 
+def source_path(name: str) -> Path:
+    """練習リストの元リストの場所。playlists/ に無ければ focus/ を見る。"""
+    f = OUT_DIR / f"{name}.bplist"
+    if not f.exists() and (FOCUS_DIR / f"{name}.bplist").exists():
+        return FOCUS_DIR / f"{name}.bplist"
+    return f
+
+
 def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]]) -> int:
     """基準精度に届いていない譜面だけを集めた練習リストを作る。未プレイは対象に含める。"""
     ok = 0
@@ -408,7 +419,7 @@ def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]])
         order: list[str] = []
         total = 0
         for src in srcs:
-            f = OUT_DIR / f"{src}.bplist"
+            f = source_path(src)
             if not f.exists():
                 print(f"  {name}: 元リスト {src} が無いのでスキップ", file=sys.stderr)
                 continue

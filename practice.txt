@@ -16,6 +16,10 @@ practice_ss_04      ranked_star_04                                 93   4     sc
 practice_ss_05      ranked_star_05                                 90   5     scoresaber
 practice_ss_06      ranked_star_06                                 80   6     scoresaber
 
+# ---- 重点練習（bs-analysis の分析で選んだ候補。元リストは focus/ に置く）----
+# SS★3：密度2.0〜3.0ノーツ/秒 × 手が中央を越える配置10%以上（2026-11-25 暫定分析）
+practice_ss_03_focus  focus_ss03_crossover                         96   3重点  scoresaber
+
 # ---- BeatLeader（ScoreSaberより☆が1つ高めに出るので、その分ずらしてある）----
 practice_bl_00-03   bl_ranked_star_00,bl_ranked_star_01,bl_ranked_star_02,bl_ranked_star_03   96   0-3   beatleader
 practice_bl_04      bl_ranked_star_04   93   4   beatleader
