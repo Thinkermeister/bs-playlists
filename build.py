@@ -359,6 +359,8 @@ def make_practice_cover(src_name: str, label: str, thr: float,
         raw = d.get("imageString") or d.get("image") or ""
         if raw.startswith("data:"):
             raw = raw.split(",", 1)[1]
+        if src.parent == FOCUS_DIR and raw:
+            return raw                                    # 重点練習は専用アイコンをそのまま使う
         im = Image.open(io.BytesIO(base64.b64decode(raw))).convert("RGB")
         im = im.resize((256, 256), Image.NEAREST)
         r, g, b = im.split()
