@@ -264,7 +264,7 @@ def sweep_orphans(expected: set[str]) -> int:
 
 # ---------- 練習リスト ----------
 
-def read_practice() -> list[tuple[str, list[str], float, str, str]]:
+def read_practice() -> list[tuple[str, list[str], float | None, str, str]]:
     """practice.txt を読む。
     列: 出力名 / 対象リスト(カンマ区切り) / 基準精度 / 中央ラベル / 判定元(scoresaber|beatleader)
     判定元を省略した場合は scoresaber とみなす。"""
@@ -280,7 +280,9 @@ def read_practice() -> list[tuple[str, list[str], float, str, str]]:
             print(f"  無視（書式不正）: {line}")
             continue
         site = parts[4].lower() if len(parts) >= 5 else "scoresaber"
-        items.append((parts[0], parts[1].split(","), float(parts[2]), parts[3], site))
+        # "auto" は譜面ごとの基準（元リストの difficulties[]._thr）を使う
+        thr = None if parts[2].lower() == "auto" else float(parts[2])
+        items.append((parts[0], parts[1].split(","), thr, parts[3], site))
     return items
 
 
@@ -428,8 +430,13 @@ def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]])
             for song in json.loads(f.read_text(encoding="utf-8")).get("songs", []):
                 h = song["hash"]
                 total += len(song.get("difficulties", []))
-                keep = [d for d in song.get("difficulties", [])
-                        if scores.get((h, d.get("characteristic"), d.get("name")), -1.0) <= thr]
+                keep = []
+                for d in song.get("difficulties", []):
+                    t = d.get("_thr", thr)                # 譜面ごとの基準があればそちらを優先
+                    if t is None:
+                        continue
+                    if scores.get((h, d.get("characteristic"), d.get("name")), -1.0) <= float(t):
+                        keep.append({k: v for k, v in d.items() if k != "_thr"})
                 if not keep:
                     continue                              # 全難易度が基準を超えていれば曲ごと除外
                 if h in merged:
@@ -447,7 +454,8 @@ def build_practice(scores_by_site: dict[str, dict[tuple[str, str, str], float]])
             continue
         tag = "SS" if site == "scoresaber" else "BL"
         data = {
-            "playlistTitle": f"\u7df4\u7fd2 {tag} \u2605{label} {thr:g}%\u4ee5\u4e0b",
+            "playlistTitle": (f"\u7df4\u7fd2 {tag} \u2605{label} {thr:g}%\u4ee5\u4e0b" if thr is not None
+                              else f"\u7df4\u7fd2 {tag} {label} \u57fa\u6e96\u4ee5\u4e0b"),
             "playlistAuthor": "bs-playlists",
             "songs": [merged[h] for h in order],
             "customData": {"syncURL": raw_url(name)},

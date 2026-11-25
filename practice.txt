@@ -1,6 +1,7 @@
 # 練習リストの設定
 #
 # 列: 出力名  対象リスト(カンマ区切り)  基準精度  中央ラベル  判定元(scoresaber|beatleader)
+#   基準精度に auto と書くと、元リストの各難易度に付けた _thr（例 "_thr": 93）を基準にする。
 #
 # 自分の記録と突き合わせて、基準精度に「届いていない」譜面だけを集める。
 #   - 未プレイの譜面は対象に含まれる（取りこぼし防止）
@@ -19,6 +20,8 @@ practice_ss_06      ranked_star_06                                 80   6     sc
 # ---- 重点練習（bs-analysis の分析で選んだ候補。元リストは focus/ に置く）----
 # SS★3：密度2.0〜3.0ノーツ/秒 × 手が中央を越える配置10%以上（2026-11-25 暫定分析）
 practice_ss_03_focus  focus_ss03_crossover                         96   3重点  scoresaber
+# SS★0-5：Claude推薦（弱点の配置・あと一歩の譜面）。基準は譜面ごと（元リストの _thr：★0-2=97 ★3=96 ★4=93 ★5=90）
+practice_ss_focus_recommend  focus_recommend                       auto  Claude推薦  scoresaber
 
 # ---- BeatLeader（ScoreSaberより☆が1つ高めに出るので、その分ずらしてある）----
 practice_bl_00-03   bl_ranked_star_00,bl_ranked_star_01,bl_ranked_star_02,bl_ranked_star_03   96   0-3   beatleader
